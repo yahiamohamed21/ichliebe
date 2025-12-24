@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>محبوبتي</title>
+
+  <style>
+    :root{
+      --bg0:#070a16;
+      --bg1:#1a0f2a;
+
+      --glass:#ffffff12;
+      --glass2:#ffffff0a;
+      --stroke:#ffffff2a;
+
+      --text:#ffffff;
+      --muted:#ffffffb6;
+
+      --pink:#ff4fa3;
+      --yellow:#ffd24a;
+      --cyan:#62f3ff;
+
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --radius: 26px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
+      color:var(--text);
+
+      /* مهم: نخلي الصفحة قابلة للتمرير لأن 21 صورة */
+      overflow:auto;
+
+      background:
+        radial-gradient(900px 700px at 75% 15%, rgba(255,79,163,.18), transparent 60%),
+        radial-gradient(900px 700px at 15% 75%, rgba(255,210,74,.16), transparent 60%),
+        radial-gradient(800px 600px at 50% 50%, rgba(98,243,255,.08), transparent 62%),
+        linear-gradient(145deg, var(--bg0), var(--bg1));
+    }
+
+    /* Aurora */
+    .aurora{
+      position:fixed; inset:-30%;
+      filter: blur(40px);
+      opacity:.55;
+      pointer-events:none;
+      z-index:0;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,79,163,.9), transparent 55%),
+        radial-gradient(circle at 70% 40%, rgba(255,210,74,.9), transparent 58%),
+        radial-gradient(circle at 45% 70%, rgba(98,243,255,.85), transparent 60%);
+      animation: drift 10s ease-in-out infinite alternate;
+      transform: rotate(8deg);
+    }
+    @keyframes drift{
+      0%{ transform: translate(-2%, -2%) rotate(6deg) scale(1.02); }
+      100%{ transform: translate(2%, 2%) rotate(10deg) scale(1.06); }
+    }
+
+    /* Stars */
+    .star{
+      position:fixed;
+      width:2px;height:2px;border-radius:50%;
+      background:#fff;
+      opacity:.65;
+      z-index:0;
+      animation: twinkle 2.4s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes twinkle{
+      0%,100%{opacity:.25; transform:scale(.8)}
+      50%{opacity:.95; transform:scale(1.4)}
+    }
+
+    /* Falling hearts */
+    .heart{
+      position:fixed;
+      top:-50px;
+      left:0;
+      pointer-events:none;
+      opacity:.9;
+      z-index:1;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
+      animation: fall linear forwards;
+      transform: translate3d(0,0,0);
+    }
+    @keyframes fall{
+      to{
+        transform: translate(var(--dx), 112vh) rotate(var(--rot));
+        opacity: .08;
+      }
+    }
+
+    /* Click sparks */
+    .spark{
+      position:fixed;
+      width:6px;height:6px;border-radius:50%;
+      background: #fff;
+      opacity:.9;
+      pointer-events:none;
+      z-index:3;
+      filter: blur(.2px);
+      animation: pop 900ms ease-out forwards;
+    }
+    @keyframes pop{
+      0%{ transform: translate(0,0) scale(1); opacity:.95; }
+      100%{ transform: translate(var(--sx), var(--sy)) scale(0); opacity:0; }
+    }
+
+    /* Layout */
+    .wrap{
+      position:relative;
+      z-index:2;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .scene{
+      width:min(860px, 95vw);
+      perspective: 900px;
+    }
+
+    .card{
+      position:relative;
+      border-radius: var(--radius);
+      padding: 18px;
+      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      transform-style: preserve-3d;
+      transition: transform .12s ease;
+      overflow:hidden;
+    }
+
+    /* moving highlight */
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(460px 260px at var(--mx, 50%) var(--my, 40%),
+                  rgba(255,255,255,.22), transparent 60%);
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    /* gradient frame */
+    .card::after{
+      content:"";
+      position:absolute; inset:0;
+      padding:1px;
+      border-radius: var(--radius);
+      background: linear-gradient(90deg, rgba(255,79,163,.9), rgba(255,210,74,.9), rgba(98,243,255,.9));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity:.35;
+      pointer-events:none;
+    }
+
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+      position:relative;
+      z-index:1;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:18px;
+      background:
+        radial-gradient(circle at 30% 30%, #fff, rgba(255,210,74,1) 36%, rgba(255,79,163,1) 80%);
+      box-shadow: 0 16px 40px rgba(255,79,163,.22);
+      border:1px solid rgba(255,255,255,.25);
+    }
+
+    .hint{
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid #ffffff22;
+      background:#ffffff0d;
+      font-weight:800;
+      color:#fff;
+      cursor:pointer;
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
+      white-space:nowrap;
+    }
+    .pill:active{ transform: scale(.98); }
+
+    .grid{
+      display:grid;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    /* Gift */
+    .gift{
+      height: 178px;
+      border-radius: 24px;
+      border:1px solid #ffffff20;
+      background:
+        radial-gradient(520px 240px at 50% 0%, rgba(255,255,255,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,79,163,.10), rgba(255,210,74,.06));
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+    }
+
+    .gift .cube{
+      width: 116px; height: 116px;
+      position:relative;
+      transform-style: preserve-3d;
+      transform: rotateX(14deg) rotateY(-18deg);
+      transition: transform .35s ease;
+    }
+    .gift:active .cube{ transform: rotateX(18deg) rotateY(-24deg) scale(.98); }
+
+    .face{
+      position:absolute; inset:0;
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.22);
+      background: linear-gradient(135deg, rgba(255,210,74,.95), rgba(255,79,163,.85));
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
+    }
+    .face.top{
+      transform: translateZ(18px);
+      background:
+        radial-gradient(circle at 30% 25%, #fff, rgba(255,210,74,1) 35%, rgba(255,79,163,1) 82%);
+    }
+    .ribbon{
+      position:absolute; inset:0;
+      border-radius: 22px;
+      background:
+        linear-gradient(90deg, transparent 44%, rgba(255,255,255,.45) 50%, transparent 56%),
+        linear-gradient(180deg, transparent 44%, rgba(255,255,255,.45) 50%, transparent 56%);
+      opacity:.55;
+      mix-blend-mode: overlay;
+    }
+    .bow{
+      position:absolute;
+      top:-10px; left:50%;
+      transform: translateX(-50%);
+      width: 70px; height: 42px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+    }
+    .bow:before,.bow:after{
+      content:"";
+      position:absolute; top:12px;
+      width:34px;height:22px;
+      border-radius: 18px 18px 18px 6px;
+      background: rgba(255,255,255,.7);
+      opacity:.85;
+    }
+    .bow:before{ left:0; transform: rotate(-12deg); }
+    .bow:after{ right:0; transform: rotate(12deg); border-radius: 18px 18px 6px 18px;}
+    .knot{
+      position:absolute;
+      top:18px; left:50%;
+      transform: translateX(-50%);
+      width:16px;height:16px;border-radius:8px;
+      background: rgba(255,255,255,.85);
+    }
+    .giftText{
+      position:absolute;
+      bottom:14px;
+      font-weight:900;
+      letter-spacing:.2px;
+      color:#fff;
+      text-shadow: 0 10px 30px rgba(0,0,0,.35);
+      opacity:.95;
+      user-select:none;
+    }
+
+    /* Controls */
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .nameBox{
+      flex:1 1 260px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius: 18px;
+      border:1px solid #ffffff22;
+      background:#ffffff0d;
+    }
+    .nameBox span{ color:var(--muted); font-size:13px; white-space:nowrap; }
+    input{
+      flex:1;
+      background:transparent;
+      border:0;
+      outline:none;
+      color:#fff;
+      font-weight:800;
+      font-size:14px;
+      min-width: 120px;
+    }
+    input::placeholder{ color:#ffffff80; font-weight:700; }
+
+    .btn{
+      border:0;
+      border-radius: 18px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      color:#120610;
+      background: linear-gradient(90deg, var(--yellow), var(--pink));
+      box-shadow: 0 16px 45px rgba(255,79,163,.16);
+      transition: transform .08s ease;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: scale(.99); }
+    .mini{
+      border:1px solid #ffffff22;
+      background:#ffffff0d;
+      color:#fff;
+      box-shadow:none;
+    }
+
+    .footerRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+      padding-top: 2px;
+    }
+
+    /* =======================
+       Section: صورك اللي بحبها
+       ======================= */
+    .photoSection{
+      position:relative;
+      border-radius: 26px;
+      border:1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(900px 340px at 15% 0%, rgba(255,210,74,.12), transparent 60%),
+        radial-gradient(900px 340px at 85% 10%, rgba(255,79,163,.12), transparent 60%),
+        rgba(255,255,255,.06);
+      overflow:hidden;
+    }
+
+    /* waves overlay */
+    .photoSection::before{
+      content:"";
+      position:absolute; inset:-40%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,79,163,.16), transparent 60%),
+        radial-gradient(circle at 70% 55%, rgba(255,210,74,.14), transparent 65%),
+        radial-gradient(circle at 50% 80%, rgba(98,243,255,.10), transparent 60%);
+      filter: blur(38px);
+      opacity:.7;
+      pointer-events:none;
+    }
+
+    .secHead{
+      position:relative;
+      padding:16px 16px 10px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      border-bottom:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.12);
+      backdrop-filter: blur(10px);
+    }
+    .secTitle{
+      display:grid;
+      gap:6px;
+    }
+    .secTitle h2{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .secTitle p{
+      margin:0;
+      font-size: 12.5px;
+      color:var(--muted);
+      font-weight:800;
+    }
+
+    .secStats{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .stat{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      font-weight:900;
+      font-size:12px;
+      color:#fff;
+      white-space:nowrap;
+    }
+
+    .galleryScroll{
+      position:relative;
+      padding:14px;
+      max-height: 58vh;
+      overflow:auto;
+    }
+
+    /* scrollbar */
+    .galleryScroll::-webkit-scrollbar{ width: 10px; }
+    .galleryScroll::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.18);
+      border-radius: 999px;
+      border: 2px solid rgba(0,0,0,.15);
+    }
+
+    .galleryGrid{
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    @media (max-width: 980px){
+      .galleryGrid{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px){
+      .galleryGrid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px){
+      .galleryGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 380px){
+      .galleryGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .tile{
+      position:relative;
+      border-radius: 18px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      cursor:pointer;
+      transform: translateZ(0);
+      transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+      aspect-ratio: 3 / 4;
+    }
+
+    .tile:hover{
+      transform: translateY(-2px) scale(1.01);
+      border-color: rgba(255,255,255,.32);
+      box-shadow: 0 26px 70px rgba(0,0,0,.32);
+    }
+
+    .tile img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.04);
+      transition: transform .22s ease, filter .22s ease;
+      filter: saturate(1.05) contrast(1.03);
+    }
+    .tile:hover img{ transform: scale(1.10); filter: saturate(1.12) contrast(1.05); }
+
+    /* shine */
+    .tile::before{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.22) 50%, transparent 60%);
+      transform: translateX(-35%);
+      opacity:0;
+      transition: opacity .18s ease;
+      pointer-events:none;
+    }
+    .tile:hover::before{
+      opacity:.75;
+      animation: shine 900ms ease-out forwards;
+    }
+    @keyframes shine{
+      to{ transform: translateX(35%); }
+    }
+
+    /* number badge */
+    .num{
+      position:absolute;
+      top:10px; right:10px;
+      padding:7px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.2px;
+      color:#fff;
+      background: rgba(0,0,0,.38);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+    }
+
+    /* tiny heart corner */
+    .cornerHeart{
+      position:absolute;
+      bottom:10px; left:10px;
+      width:34px; height:34px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      opacity:.95;
+    }
+
+    /* ===== Message Modal ===== */
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      z-index:5;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(8px);
+      padding:22px;
+    }
+    .modal.show{ display:grid; }
+
+    .sheet{
+      width:min(760px, 95vw);
+      border-radius: 28px;
+      border:1px solid rgba(255,255,255,.22);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.08));
+      box-shadow: 0 28px 90px rgba(0,0,0,.6);
+      overflow:hidden;
+      transform: translateY(10px) scale(.98);
+      animation: in .22s ease-out forwards;
+    }
+    @keyframes in{ to{ transform: translateY(0) scale(1); } }
+
+    .sheetTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.16);
+      background: radial-gradient(700px 260px at 50% 0%, rgba(255,79,163,.16), transparent 60%);
+    }
+    .sheetTop strong{ font-size:16px; letter-spacing:.2px; }
+
+    .close{
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+      color:#fff;
+      border-radius: 14px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .sheetBody{ padding:16px; display:grid; gap:14px; }
+
+    .msg{
+      border-radius: 22px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(520px 200px at 20% 0%, rgba(255,210,74,.14), transparent 60%),
+        radial-gradient(520px 200px at 80% 30%, rgba(255,79,163,.14), transparent 60%),
+        rgba(255,255,255,.06);
+      line-height: 2.0;
+      font-size: 16px;
+      white-space:pre-wrap;
+      min-height: 132px;
+    }
+
+    /* ===== Lightbox ===== */
+    .lightbox{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      z-index:6;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      padding:18px;
+    }
+    .lightbox.show{ display:grid; }
+    .lbCard{
+      width:min(980px, 96vw);
+      border-radius: 26px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 30px 100px rgba(0,0,0,.65);
+      overflow:hidden;
+    }
+    .lbTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.14);
+      color:var(--muted);
+      font-weight:900;
+      font-size:13px;
+      background: rgba(0,0,0,.10);
+    }
+    .lbBtns{ display:flex; gap:8px; flex-wrap:wrap; }
+    .lbBtn{
+      border:1px solid rgba(255,255,255,.20);
+      background: rgba(255,255,255,.08);
+      color:#fff;
+      border-radius: 14px;
+      padding:10px 12px;
+      font-weight:1000;
+      cursor:pointer;
+    }
+    .lbBody{
+      display:grid;
+      place-items:center;
+      background: rgba(0,0,0,.18);
+    }
+    .lbBody img{
+      width:100%;
+      max-height: 78vh;
+      object-fit: contain;
+      display:block;
+    }
+
+    /* reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+  <div id="stars" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <section class="scene">
+      <div class="card" id="card">
+        <div class="top">
+          <div class="brand">
+            <span class="logo" aria-hidden="true"></span>
+            <span>محبوبتي</span>
+          </div>
+
+          <div class="hint">
+            <button class="pill" id="toggleHearts">القلوب: شغّالة</button>
+            <button class="pill" id="toggleStars">النجوم: شغّالة</button>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="gift" id="gift" role="button" tabindex="0" aria-label="اضغطي لفتح الرسالة">
+            <div class="cube" aria-hidden="true">
+              <div class="face top"></div>
+              <div class="ribbon"></div>
+              <div class="bow"><div class="knot"></div></div>
+            </div>
+            <div class="giftText">اضغطي هنا يا أحلى كتكوته 💛</div>
+          </div>
+
+          <div class="controls">
+            <div class="nameBox">
+              <input id="nickname" placeholder="مثلاً: كتكوته" value="حياتي" />
+            </div>
+            <button class="btn" id="another">رسالة تانية ✨</button>
+            <button class="btn mini" id="burst">قلوب كتير 💗</button>
+          </div>
+
+          <!-- ========= سيكشن الصور الجديد ========= -->
+          <section class="photoSection" aria-label="صورك اللي بحبها">
+            <div class="secHead">
+              <div class="secTitle">
+                <h2>صورك اللي بحبها 💛</h2>
+              </div>
+              <div class="secStats">
+                <span class="stat" id="photoCount">  بعض من الصوه ممتلئه بالكياته </span>
+                <span class="stat">✨ مش بحب في الدنيا قدك </span>
+              </div>
+            </div>
+
+            <div class="galleryScroll">
+              <div class="galleryGrid" id="gallery"></div>
+            </div>
+          </section>
+
+          <div class="footerRow">
+            <span id="counter">💗 0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal الرسالة -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="رسالة محبوبتي">
+      <div class="sheetTop">
+        <strong>رسالة لـ <span id="who">كتكوته</span> 💛</strong>
+        <button class="close" id="close">إغلاق</button>
+      </div>
+      <div class="sheetBody">
+        <div class="msg" id="msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox للصور -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lbCard" role="dialog" aria-modal="true" aria-label="عارض الصور">
+      <div class="lbTop">
+        <div id="lbTitle">صورة</div>
+        <div class="lbBtns">
+          <button class="lbBtn" id="lbPrev">السابق</button>
+          <button class="lbBtn" id="lbNext">التالي</button>
+          <button class="lbBtn" id="lbClose">إغلاق</button>
+        </div>
+      </div>
+      <div class="lbBody">
+        <img id="lbImg" alt="صورة" />
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== رسائل رومانسية =====
+  const messages = [
+    `يا {name} 💛
+إنتِ قد الفترة دي… وإن شاء الله هتعدّي على خير.
+أنا فخور بيكي وبقوتك، وقلبي معاكي لحظة بلحظة.
+  وعمري ماهسيبك يروحي والله وكل حاجة هتبقى تمام 💗`,
+
+    `محبوبتي {name} ✨
+حتى لو الدنيا تقيلة شوية .
+ربنا يطمن قلبك ويبدّل تعبك راحة،
+وكل خطوة بتقربيك للفرَج 💛`,
+
+    `يا أحلى {name} 🌙
+اللي بيعدّي صعب دلوقتي… هيبقى ذكرى،
+وإنتِ هتبقي مبسوطة إنك وقفتي ومكملتي.
+أنا جنبك دايمًا  
+بحبك اوييييييييييييييي 💗`,
+
+    `{name} 💛
+خليكي حنينة على نفسك…
+وادي لنفسك حقها في الراحة.
+   بحبك ي احلا واحده حنينه عليا في الدنيا واكتر حاجه انا دايب فيها      ✨`
+  ];
+
+  // ===== عناصر عامة =====
+  const card = document.getElementById("card");
+  const gift = document.getElementById("gift");
+  const modal = document.getElementById("modal");
+  const closeBtn = document.getElementById("close");
+  const msgEl = document.getElementById("msg");
+  const whoEl = document.getElementById("who");
+  const nicknameEl = document.getElementById("nickname");
+  const anotherBtn = document.getElementById("another");
+  const burstBtn = document.getElementById("burst");
+  const counterEl = document.getElementById("counter");
+  const toggleHeartsBtn = document.getElementById("toggleHearts");
+  const toggleStarsBtn = document.getElementById("toggleStars");
+  const starsWrap = document.getElementById("stars");
+
+  // Gallery
+  const galleryEl = document.getElementById("gallery");
+  const photoCountEl = document.getElementById("photoCount");
+
+  // Lightbox
+  const lightbox = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbTitle = document.getElementById("lbTitle");
+  const lbClose = document.getElementById("lbClose");
+  const lbPrev = document.getElementById("lbPrev");
+  const lbNext = document.getElementById("lbNext");
+
+  let heartsOn = true;
+  let starsOn = true;
+  let heartCount = 0;
+  let lastMsg = -1;
+  let typerTimer = null;
+
+  // ===== 3D tilt للكارت =====
+  card.addEventListener("mousemove", (e) => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const rx = ((y / r.height) - 0.5) * -6;
+    const ry = ((x / r.width) - 0.5) * 8;
+    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    card.style.setProperty("--mx", (x / r.width) * 100 + "%");
+    card.style.setProperty("--my", (y / r.height) * 100 + "%");
+  });
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "rotateX(0deg) rotateY(0deg)";
+  });
+
+  function getName(){
+    const v = (nicknameEl.value || "").trim();
+    return v.length ? v : "كتكوته";
+  }
+
+  function pickMessage(){
+    let i = Math.floor(Math.random() * messages.length);
+    if (messages.length > 1){
+      while (i === lastMsg) i = Math.floor(Math.random() * messages.length);
+    }
+    lastMsg = i;
+    return messages[i].replaceAll("{name}", getName());
+  }
+
+  function openModal(){
+    whoEl.textContent = getName();
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal(){
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+    stopTyping();
+  }
+  function stopTyping(){
+    if (typerTimer) clearInterval(typerTimer);
+    typerTimer = null;
+  }
+  function typeMessage(text){
+    stopTyping();
+    msgEl.textContent = "";
+    let i = 0;
+    typerTimer = setInterval(() => {
+      msgEl.textContent += text[i] ?? "";
+      i++;
+      if (i >= text.length) stopTyping();
+    }, 18);
+  }
+  function showMessage(){
+    const text = pickMessage();
+    openModal();
+    typeMessage(text);
+    popHearts(14);
+  }
+
+  // ===== شرارات =====
+  function sparks(x,y){
+    const n = 14;
+    for (let i=0;i<n;i++){
+      const s = document.createElement("div");
+      s.className = "spark";
+      s.style.left = x + "px";
+      s.style.top = y + "px";
+      s.style.setProperty("--sx", rand(-120,120) + "px");
+      s.style.setProperty("--sy", rand(-120,120) + "px");
+      s.style.opacity = (Math.random()*0.5 + 0.4).toFixed(2);
+      document.body.appendChild(s);
+      s.addEventListener("animationend", () => s.remove());
+    }
+  }
+
+  // ===== قلوب =====
+  function createHeart(){
+    const heart = document.createElement("div");
+    heart.className = "heart";
+
+    const size = rand(14, 42);
+    const left = Math.random() * 100;
+    const duration = rand(4200, 9800);
+    const dx = rand(-22, 22) + "vw";
+    const rot = rand(-40, 40) + "deg";
+    const opacity = (Math.random()*0.35 + 0.55).toFixed(2);
+
+    heart.style.left = left + "vw";
+    heart.style.width = size + "px";
+    heart.style.height = size + "px";
+    heart.style.setProperty("--dx", dx);
+    heart.style.setProperty("--rot", rot);
+    heart.style.animationDuration = duration + "ms";
+    heart.style.opacity = opacity;
+
+    const color = Math.random() < 0.62 ? "#ff4fa3" : (Math.random() < 0.6 ? "#ffd24a" : "#62f3ff");
+
+    heart.innerHTML = `
+      <svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21s-6.716-4.29-9.5-8.07C.42 10.62 1.1 7.67 3.05 5.9c1.95-1.77 4.99-1.55 6.64.35L12 8.6l2.31-2.35c1.65-1.9 4.69-2.12 6.64-.35 1.95 1.77 2.63 4.72.55 7.03C18.716 16.71 12 21 12 21z"/>
+      </svg>
+    `;
+
+    document.body.appendChild(heart);
+    heartCount++;
+    counterEl.textContent = "💗 " + heartCount;
+    heart.addEventListener("animationend", () => heart.remove());
+  }
+
+  function popHearts(n=10){
+    if (!heartsOn) return;
+    for (let i=0;i<n;i++){
+      setTimeout(createHeart, i*80);
+    }
+  }
+
+  setInterval(() => { if (heartsOn) createHeart(); }, 620);
+
+  toggleHeartsBtn.addEventListener("click", () => {
+    heartsOn = !heartsOn;
+    toggleHeartsBtn.textContent = heartsOn ? "القلوب: شغّالة" : "القلوب: متوقفة";
+    if (heartsOn) popHearts(10);
+  });
+
+  function buildStars(){
+    starsWrap.innerHTML = "";
+    if (!starsOn) return;
+    for (let i=0;i<70;i++){
+      const s = document.createElement("div");
+      s.className = "star";
+      s.style.left = rand(0,100) + "vw";
+      s.style.top  = rand(0,100) + "vh";
+      s.style.animationDelay = rand(0,2200) + "ms";
+      s.style.opacity = (Math.random()*0.5 + 0.25).toFixed(2);
+      starsWrap.appendChild(s);
+    }
+  }
+
+  toggleStarsBtn.addEventListener("click", () => {
+    starsOn = !starsOn;
+    toggleStarsBtn.textContent = starsOn ? "النجوم: شغّالة" : "النجوم: متوقفة";
+    buildStars();
+  });
+
+  // ====== صورك اللي بحبها (21 صورة) ======
+  // ضع الملفات في: images/1.png ... images/21.png
+  const photos = Array.from({length: 21}, (_, i) => ({
+    src: `images/${i+1}.jpeg`,
+    n: i+1
+  }));
+
+  photoCountEl.textContent = `📸`;
+
+  function renderGallery(){
+    galleryEl.innerHTML = "";
+    photos.forEach((p, idx) => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.innerHTML = `
+        <img src="${p.src}" alt="صورة رقم ${p.n}" loading="lazy">
+        <div class="num">#${p.n}</div>
+        <div class="cornerHeart" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="rgba(255,255,255,.92)" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21s-6.716-4.29-9.5-8.07C.42 10.62 1.1 7.67 3.05 5.9c1.95-1.77 4.99-1.55 6.64.35L12 8.6l2.31-2.35c1.65-1.9 4.69-2.12 6.64-.35 1.95 1.77 2.63 4.72.55 7.03C18.716 16.71 12 21 12 21z"/>
+          </svg>
+        </div>
+      `;
+      tile.addEventListener("click", () => openLightbox(idx));
+      galleryEl.appendChild(tile);
+    });
+  }
+
+  let currentIndex = 0;
+
+  function openLightbox(idx){
+    currentIndex = idx;
+    const p = photos[currentIndex];
+    lbImg.src = p.src;
+    lbTitle.textContent = ` دي صورك اللي بحبها  يروحي• ${p.n}/${photos.length}`;
+    lightbox.classList.add("show");
+    lightbox.setAttribute("aria-hidden", "false");
+    popHearts(10);
+  }
+
+  function closeLightbox(){
+    lightbox.classList.remove("show");
+    lightbox.setAttribute("aria-hidden", "true");
+    lbImg.src = "";
+  }
+
+  function stepLightbox(dir){
+    currentIndex = (currentIndex + dir + photos.length) % photos.length;
+    openLightbox(currentIndex);
+  }
+
+  lbClose.addEventListener("click", closeLightbox);
+  lbPrev.addEventListener("click", () => stepLightbox(-1));
+  lbNext.addEventListener("click", () => stepLightbox(1));
+  lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+
+  // ===== أحداث =====
+  gift.addEventListener("click", (e) => { sparks(e.clientX, e.clientY); showMessage(); });
+  gift.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " "){ e.preventDefault(); showMessage(); }
+  });
+
+  anotherBtn.addEventListener("click", () => { sparks(innerWidth*0.7, innerHeight*0.5); showMessage(); });
+  burstBtn.addEventListener("click", () => { sparks(innerWidth*0.5, innerHeight*0.55); popHearts(26); });
+
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { closeModal(); closeLightbox(); }
+    if (lightbox.classList.contains("show")){
+      if (e.key === "ArrowLeft") stepLightbox(1);
+      if (e.key === "ArrowRight") stepLightbox(-1);
+    }
+  });
+
+  // init
+  buildStars();
+  renderGallery();
+
+  function rand(min, max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+</script>
+</body>
+</html>
