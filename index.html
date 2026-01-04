@@ -759,6 +759,19 @@
     </div>
   </div>
 
+  <!-- Modal رسالة البداية (الجديد) -->
+  <div class="modal" id="startModal" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="رسالة البداية">
+      <div class="sheetTop">
+        <strong>رسالة لـ <span id="startWho">كتكوته</span> 💛</strong>
+        <button class="close" id="startClose">إغلاق</button>
+      </div>
+      <div class="sheetBody">
+        <div class="msg" id="startMsg"></div>
+      </div>
+    </div>
+  </div>
+
 <script>
   // ===== رسائل رومانسية =====
   const messages = [
@@ -810,6 +823,12 @@
   const lbClose = document.getElementById("lbClose");
   const lbPrev = document.getElementById("lbPrev");
   const lbNext = document.getElementById("lbNext");
+
+  // ===== (الجديد) عناصر رسالة البداية =====
+  const startModal = document.getElementById("startModal");
+  const startClose = document.getElementById("startClose");
+  const startMsgEl = document.getElementById("startMsg");
+  const startWhoEl = document.getElementById("startWho");
 
   let heartsOn = true;
   let starsOn = true;
@@ -876,6 +895,29 @@
     typeMessage(text);
     popHearts(14);
   }
+
+  // ===== (الجديد) رسالة البداية =====
+  function openStartModal(){
+    const name = getName();
+    startWhoEl.textContent = name;
+
+    const text =
+`أنا بحبك أوي يا فرحه💛
+ومش هحب غيرك
+ومن بعدك هقفل قلبي عليكي.
+وأكونتاتي هتفضل بالباسورد بتاعها مش هغيرهم عشان خاطرك. عشان انا عارف دماغك هتقولك ان حد دخل حياتي واتعيرت عليكي بسببه بس ده والله ماحصل هو انا عمري في كام سنه عشان الافي واحده اعرفها قدك بحبك والله`;
+
+    startModal.classList.add("show");
+    startModal.setAttribute("aria-hidden", "false");
+    startMsgEl.textContent = text; // بدون كتابة تدريجية
+    popHearts(12);
+  }
+  function closeStartModal(){
+    startModal.classList.remove("show");
+    startModal.setAttribute("aria-hidden", "true");
+  }
+  startClose.addEventListener("click", closeStartModal);
+  startModal.addEventListener("click", (e) => { if (e.target === startModal) closeStartModal(); });
 
   // ===== شرارات =====
   function sparks(x,y){
@@ -963,7 +1005,7 @@
   });
 
   // ====== صورك اللي بحبها (21 صورة) ======
-  // ضع الملفات في: images/1.png ... images/21.png
+  // ضع الملفات في: images/1.jpeg ... images/21.jpeg
   const photos = Array.from({length: 21}, (_, i) => ({
     src: `images/${i+1}.jpeg`,
     n: i+1
@@ -1031,7 +1073,7 @@
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); closeLightbox(); }
+    if (e.key === "Escape") { closeModal(); closeLightbox(); closeStartModal(); }
     if (lightbox.classList.contains("show")){
       if (e.key === "ArrowLeft") stepLightbox(1);
       if (e.key === "ArrowRight") stepLightbox(-1);
@@ -1041,6 +1083,11 @@
   // init
   buildStars();
   renderGallery();
+
+  // (الجديد) تشغيل رسالة البداية أول ما الصفحة تفتح
+  window.addEventListener("load", () => {
+    openStartModal();
+  });
 
   function rand(min, max){
     return Math.floor(Math.random()*(max-min+1))+min;
