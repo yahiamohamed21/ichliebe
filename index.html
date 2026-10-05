@@ -2,747 +2,676 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>محبوبتي</title>
 
+  <!-- Tailwind CSS v3 via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Alexandria, Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pinkNeon: '#ff007f',
+            pinkGlow: 'rgba(255, 0, 127, 0.55)',
+            yellowGold: '#ffd700',
+            cyanNeon: '#00f5ff',
+            purpleNeon: '#a855f7',
+            darkBg: '#03020a',
+          },
+          fontFamily: {
+            alexandria: ['Alexandria', 'sans-serif'],
+            cairo: ['Cairo', 'sans-serif'],
+            tajawal: ['Tajawal', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root{
-      --bg0:#070a16;
-      --bg1:#1a0f2a;
-
-      --glass:#ffffff12;
-      --glass2:#ffffff0a;
-      --stroke:#ffffff2a;
-
-      --text:#ffffff;
-      --muted:#ffffffb6;
-
-      --pink:#ff4fa3;
-      --yellow:#ffd24a;
-      --cyan:#62f3ff;
-
-      --shadow: 0 22px 70px rgba(0,0,0,.55);
-      --radius: 26px;
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
-      color:var(--text);
-
-      /* مهم: نخلي الصفحة قابلة للتمرير لأن 21 صورة */
-      overflow:auto;
-
-      background:
-        radial-gradient(900px 700px at 75% 15%, rgba(255,79,163,.18), transparent 60%),
-        radial-gradient(900px 700px at 15% 75%, rgba(255,210,74,.16), transparent 60%),
-        radial-gradient(800px 600px at 50% 50%, rgba(98,243,255,.08), transparent 62%),
-        linear-gradient(145deg, var(--bg0), var(--bg1));
+    body {
+      font-family: 'Alexandria', 'Cairo', 'Tajawal', sans-serif;
+      background-color: #03020a;
+      color: #ffffff;
+      overflow-x: hidden;
     }
 
-    /* Aurora */
-    .aurora{
-      position:fixed; inset:-30%;
-      filter: blur(40px);
-      opacity:.55;
-      pointer-events:none;
-      z-index:0;
-      mix-blend-mode: screen;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(255,79,163,.9), transparent 55%),
-        radial-gradient(circle at 70% 40%, rgba(255,210,74,.9), transparent 58%),
-        radial-gradient(circle at 45% 70%, rgba(98,243,255,.85), transparent 60%);
-      animation: drift 10s ease-in-out infinite alternate;
-      transform: rotate(8deg);
-    }
-    @keyframes drift{
-      0%{ transform: translate(-2%, -2%) rotate(6deg) scale(1.02); }
-      100%{ transform: translate(2%, 2%) rotate(10deg) scale(1.06); }
+    /* HTML5 Canvas Background */
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* Stars */
-    .star{
-      position:fixed;
-      width:2px;height:2px;border-radius:50%;
-      background:#fff;
-      opacity:.65;
-      z-index:0;
-      animation: twinkle 2.4s ease-in-out infinite;
-      pointer-events:none;
-    }
-    @keyframes twinkle{
-      0%,100%{opacity:.25; transform:scale(.8)}
-      50%{opacity:.95; transform:scale(1.4)}
+    /* Falling Hearts Particle */
+    .heart {
+      position: fixed;
+      top: -60px;
+      left: 0;
+      pointer-events: none;
+      opacity: 0.95;
+      z-index: 1;
+      filter: drop-shadow(0 10px 22px rgba(255, 0, 127, 0.6));
+      animation: heartFall linear forwards;
     }
 
-    /* Falling hearts */
-    .heart{
-      position:fixed;
-      top:-50px;
-      left:0;
-      pointer-events:none;
-      opacity:.9;
-      z-index:1;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
-      animation: fall linear forwards;
-      transform: translate3d(0,0,0);
-    }
-    @keyframes fall{
-      to{
-        transform: translate(var(--dx), 112vh) rotate(var(--rot));
-        opacity: .08;
+    @keyframes heartFall {
+      0% { opacity: 0.95; transform: translate(0, 0) rotate(0deg); }
+      100% {
+        transform: translate(var(--dx), 115vh) rotate(var(--rot));
+        opacity: 0;
       }
     }
 
-    /* Click sparks */
-    .spark{
-      position:fixed;
-      width:6px;height:6px;border-radius:50%;
-      background: #fff;
-      opacity:.9;
-      pointer-events:none;
-      z-index:3;
-      filter: blur(.2px);
-      animation: pop 900ms ease-out forwards;
-    }
-    @keyframes pop{
-      0%{ transform: translate(0,0) scale(1); opacity:.95; }
-      100%{ transform: translate(var(--sx), var(--sy)) scale(0); opacity:0; }
+    /* Click Spark Burst */
+    .spark {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 20%, #ffd700 100%);
+      opacity: 1;
+      pointer-events: none;
+      z-index: 999;
+      box-shadow: 0 0 16px #ffd700;
+      animation: sparkPop 850ms cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
     }
 
-    /* Layout */
-    .wrap{
-      position:relative;
-      z-index:2;
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:24px;
+    @keyframes sparkPop {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
     }
 
-    .scene{
-      width:min(860px, 95vw);
-      perspective: 900px;
-    }
-
-    .card{
-      position:relative;
-      border-radius: var(--radius);
-      padding: 18px;
-      background: linear-gradient(180deg, var(--glass), var(--glass2));
-      border: 1px solid var(--stroke);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+    /* 3D Gift Box Styling */
+    .cube {
+      width: 120px;
+      height: 120px;
+      position: relative;
       transform-style: preserve-3d;
-      transition: transform .12s ease;
-      overflow:hidden;
+      transform: rotateX(18deg) rotateY(-24deg);
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      animation: cubeFloat 4s ease-in-out infinite alternate;
     }
 
-    /* moving highlight */
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(460px 260px at var(--mx, 50%) var(--my, 40%),
-                  rgba(255,255,255,.22), transparent 60%);
-      opacity:.55;
-      pointer-events:none;
+    @media (max-width: 640px) {
+      .cube {
+        width: 95px;
+        height: 95px;
+      }
     }
 
-    /* gradient frame */
-    .card::after{
-      content:"";
-      position:absolute; inset:0;
-      padding:1px;
-      border-radius: var(--radius);
-      background: linear-gradient(90deg, rgba(255,79,163,.9), rgba(255,210,74,.9), rgba(98,243,255,.9));
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      opacity:.35;
-      pointer-events:none;
+    @keyframes cubeFloat {
+      0% { transform: rotateX(18deg) rotateY(-24deg) translateY(0); }
+      100% { transform: rotateX(22deg) rotateY(-18deg) translateY(-8px); }
     }
 
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
-      position:relative;
-      z-index:1;
-      flex-wrap:wrap;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .logo{
-      width:44px;height:44px;border-radius:18px;
-      background:
-        radial-gradient(circle at 30% 30%, #fff, rgba(255,210,74,1) 36%, rgba(255,79,163,1) 80%);
-      box-shadow: 0 16px 40px rgba(255,79,163,.22);
-      border:1px solid rgba(255,255,255,.25);
+    .group:hover .cube {
+      transform: rotateX(24deg) rotateY(-32deg) scale(1.1);
+      animation-play-state: paused;
     }
 
-    .hint{
-      font-size:13px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      gap:10px;
-      user-select:none;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .pill{
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid #ffffff22;
-      background:#ffffff0d;
-      font-weight:800;
-      color:#fff;
-      cursor:pointer;
-      transition: transform .08s ease, background .12s ease, border-color .12s ease;
-      white-space:nowrap;
-    }
-    .pill:active{ transform: scale(.98); }
-
-    .grid{
-      display:grid;
-      gap:14px;
-      position:relative;
-      z-index:1;
-    }
-
-    /* Gift */
-    .gift{
-      height: 178px;
+    .face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
-      border:1px solid #ffffff20;
-      background:
-        radial-gradient(520px 240px at 50% 0%, rgba(255,255,255,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,79,163,.10), rgba(255,210,74,.06));
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      position:relative;
-      overflow:hidden;
-      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      background: linear-gradient(135deg, #ffd700 10%, #ff007f 90%);
+      box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.4), 0 15px 40px rgba(255, 0, 127, 0.4);
     }
 
-    .gift .cube{
-      width: 116px; height: 116px;
-      position:relative;
-      transform-style: preserve-3d;
-      transform: rotateX(14deg) rotateY(-18deg);
-      transition: transform .35s ease;
+    .face.top {
+      transform: translateZ(26px);
+      background: radial-gradient(circle at 30% 30%, #ffffff, #ffd700 45%, #ff007f 90%);
     }
-    .gift:active .cube{ transform: rotateX(18deg) rotateY(-24deg) scale(.98); }
 
-    .face{
-      position:absolute; inset:0;
-      border-radius: 22px;
-      border:1px solid rgba(255,255,255,.22);
-      background: linear-gradient(135deg, rgba(255,210,74,.95), rgba(255,79,163,.85));
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
-    }
-    .face.top{
-      transform: translateZ(18px);
+    .ribbon {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
       background:
-        radial-gradient(circle at 30% 25%, #fff, rgba(255,210,74,1) 35%, rgba(255,79,163,1) 82%);
-    }
-    .ribbon{
-      position:absolute; inset:0;
-      border-radius: 22px;
-      background:
-        linear-gradient(90deg, transparent 44%, rgba(255,255,255,.45) 50%, transparent 56%),
-        linear-gradient(180deg, transparent 44%, rgba(255,255,255,.45) 50%, transparent 56%);
-      opacity:.55;
+        linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.9) 50%, transparent 60%),
+        linear-gradient(180deg, transparent 40%, rgba(255, 255, 255, 0.9) 50%, transparent 60%);
+      opacity: 0.85;
       mix-blend-mode: overlay;
     }
-    .bow{
-      position:absolute;
-      top:-10px; left:50%;
+
+    .bow {
+      position: absolute;
+      top: -16px;
+      left: 50%;
       transform: translateX(-50%);
-      width: 70px; height: 42px;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+      width: 76px;
+      height: 46px;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
     }
-    .bow:before,.bow:after{
-      content:"";
-      position:absolute; top:12px;
-      width:34px;height:22px;
-      border-radius: 18px 18px 18px 6px;
-      background: rgba(255,255,255,.7);
-      opacity:.85;
+
+    .bow::before, .bow::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      width: 38px;
+      height: 26px;
+      border-radius: 24px 24px 24px 6px;
+      background: linear-gradient(135deg, #ffffff, #fff59d);
+      opacity: 0.95;
     }
-    .bow:before{ left:0; transform: rotate(-12deg); }
-    .bow:after{ right:0; transform: rotate(12deg); border-radius: 18px 18px 6px 18px;}
-    .knot{
-      position:absolute;
-      top:18px; left:50%;
+
+    .bow::before { left: 0; transform: rotate(-18deg); }
+    .bow::after { right: 0; transform: rotate(18deg); border-radius: 24px 24px 6px 24px; }
+
+    .knot {
+      position: absolute;
+      top: 17px;
+      left: 50%;
       transform: translateX(-50%);
-      width:16px;height:16px;border-radius:8px;
-      background: rgba(255,255,255,.85);
-    }
-    .giftText{
-      position:absolute;
-      bottom:14px;
-      font-weight:900;
-      letter-spacing:.2px;
-      color:#fff;
-      text-shadow: 0 10px 30px rgba(0,0,0,.35);
-      opacity:.95;
-      user-select:none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    /* Controls */
-    .controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .nameBox{
-      flex:1 1 260px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 14px;
-      border-radius: 18px;
-      border:1px solid #ffffff22;
-      background:#ffffff0d;
-    }
-    .nameBox span{ color:var(--muted); font-size:13px; white-space:nowrap; }
-    input{
-      flex:1;
-      background:transparent;
-      border:0;
-      outline:none;
-      color:#fff;
-      font-weight:800;
-      font-size:14px;
-      min-width: 120px;
-    }
-    input::placeholder{ color:#ffffff80; font-weight:700; }
-
-    .btn{
-      border:0;
-      border-radius: 18px;
-      padding:12px 14px;
-      font-weight:900;
-      cursor:pointer;
-      color:#120610;
-      background: linear-gradient(90deg, var(--yellow), var(--pink));
-      box-shadow: 0 16px 45px rgba(255,79,163,.16);
-      transition: transform .08s ease;
-      white-space:nowrap;
-    }
-    .btn:active{ transform: scale(.99); }
-    .mini{
-      border:1px solid #ffffff22;
-      background:#ffffff0d;
-      color:#fff;
-      box-shadow:none;
+    /* Bento Box Responsive Grid Layout */
+    .galleryGrid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-auto-rows: 200px;
     }
 
-    .footerRow{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:12px;
-      padding-top: 2px;
+    @media (max-width: 1024px) {
+      .galleryGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-auto-rows: 180px;
+      }
     }
 
-    /* =======================
-       Section: صورك اللي بحبها
-       ======================= */
-    .photoSection{
-      position:relative;
-      border-radius: 26px;
-      border:1px solid rgba(255,255,255,.18);
-      background:
-        radial-gradient(900px 340px at 15% 0%, rgba(255,210,74,.12), transparent 60%),
-        radial-gradient(900px 340px at 85% 10%, rgba(255,79,163,.12), transparent 60%),
-        rgba(255,255,255,.06);
-      overflow:hidden;
+    @media (max-width: 640px) {
+      .galleryGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: 155px;
+        gap: 10px;
+      }
+
+      /* On Mobile: Make all tiles 1x1 span for clean 2-column mobile layout */
+      .tile:nth-child(1),
+      .tile:nth-child(7),
+      .tile:nth-child(14) {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+      }
     }
 
-    /* waves overlay */
-    .photoSection::before{
-      content:"";
-      position:absolute; inset:-40%;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,79,163,.16), transparent 60%),
-        radial-gradient(circle at 70% 55%, rgba(255,210,74,.14), transparent 65%),
-        radial-gradient(circle at 50% 80%, rgba(98,243,255,.10), transparent 60%);
-      filter: blur(38px);
-      opacity:.7;
-      pointer-events:none;
+    @media (min-width: 641px) {
+      .tile:nth-child(1),
+      .tile:nth-child(7),
+      .tile:nth-child(14) {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
     }
 
-    .secHead{
-      position:relative;
-      padding:16px 16px 10px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      border-bottom:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.12);
-      backdrop-filter: blur(10px);
-    }
-    .secTitle{
-      display:grid;
-      gap:6px;
-    }
-    .secTitle h2{
-      margin:0;
-      font-size: 18px;
-      letter-spacing:.2px;
-    }
-    .secTitle p{
-      margin:0;
-      font-size: 12.5px;
-      color:var(--muted);
-      font-weight:800;
+    /* Modals System Mobile Responsive */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 100;
+      background: rgba(2, 3, 12, 0.88);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
 
-    .secStats{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .stat{
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      font-weight:900;
-      font-size:12px;
-      color:#fff;
-      white-space:nowrap;
+    .modal.show {
+      display: grid;
+      opacity: 1;
     }
 
-    .galleryScroll{
-      position:relative;
-      padding:14px;
-      max-height: 58vh;
-      overflow:auto;
+    .sheet {
+      position: relative;
+      width: min(780px, 95vw);
+      border-radius: 32px;
+      border: 1.5px solid rgba(255, 0, 127, 0.5);
+      background: linear-gradient(165deg, rgba(32, 18, 56, 0.98), rgba(12, 14, 32, 0.98));
+      box-shadow: 0 45px 140px rgba(0, 0, 0, 0.95), 0 0 100px rgba(255, 0, 127, 0.38);
+      overflow: hidden;
+      transform: scale(0.88) translateY(35px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* scrollbar */
-    .galleryScroll::-webkit-scrollbar{ width: 10px; }
-    .galleryScroll::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,.18);
-      border-radius: 999px;
-      border: 2px solid rgba(0,0,0,.15);
+    .modal.show .sheet {
+      transform: scale(1) translateY(0);
     }
 
-    .galleryGrid{
-      display:grid;
-      gap:12px;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+    .sheetTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      background: radial-gradient(800px circle at 50% 0%, rgba(255, 0, 127, 0.4), transparent 80%);
     }
 
-    @media (max-width: 980px){
-      .galleryGrid{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
-    }
-    @media (max-width: 720px){
-      .galleryGrid{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
-    @media (max-width: 520px){
-      .galleryGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    @media (max-width: 380px){
-      .galleryGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sheetTop strong {
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .tile{
-      position:relative;
-      border-radius: 18px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.06);
-      box-shadow: 0 18px 50px rgba(0,0,0,.22);
-      cursor:pointer;
-      transform: translateZ(0);
-      transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
-      aspect-ratio: 3 / 4;
+    @media (min-width: 640px) {
+      .sheetTop {
+        padding: 24px 30px;
+      }
+      .sheetTop strong {
+        font-size: 21px;
+        gap: 12px;
+      }
     }
 
-    .tile:hover{
-      transform: translateY(-2px) scale(1.01);
-      border-color: rgba(255,255,255,.32);
-      box-shadow: 0 26px 70px rgba(0,0,0,.32);
-    }
-
-    .tile img{
-      width:100%; height:100%;
-      object-fit: cover;
-      display:block;
-      transform: scale(1.04);
-      transition: transform .22s ease, filter .22s ease;
-      filter: saturate(1.05) contrast(1.03);
-    }
-    .tile:hover img{ transform: scale(1.10); filter: saturate(1.12) contrast(1.05); }
-
-    /* shine */
-    .tile::before{
-      content:"";
-      position:absolute; inset:-40%;
-      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.22) 50%, transparent 60%);
-      transform: translateX(-35%);
-      opacity:0;
-      transition: opacity .18s ease;
-      pointer-events:none;
-    }
-    .tile:hover::before{
-      opacity:.75;
-      animation: shine 900ms ease-out forwards;
-    }
-    @keyframes shine{
-      to{ transform: translateX(35%); }
-    }
-
-    /* number badge */
-    .num{
-      position:absolute;
-      top:10px; right:10px;
-      padding:7px 10px;
-      border-radius: 999px;
-      font-size:12px;
-      font-weight:1000;
-      letter-spacing:.2px;
-      color:#fff;
-      background: rgba(0,0,0,.38);
-      border:1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(10px);
-    }
-
-    /* tiny heart corner */
-    .cornerHeart{
-      position:absolute;
-      bottom:10px; left:10px;
-      width:34px; height:34px;
+    .close {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
       border-radius: 14px;
-      display:grid;
-      place-items:center;
-      background: rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(10px);
-      opacity:.95;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      white-space: nowrap;
     }
 
-    /* ===== Message Modal ===== */
-    .modal{
-      position:fixed; inset:0;
-      display:none;
-      place-items:center;
-      z-index:5;
-      background: rgba(0,0,0,.45);
-      backdrop-filter: blur(8px);
-      padding:22px;
+    @media (min-width: 640px) {
+      .close {
+        border-radius: 16px;
+        padding: 10px 22px;
+        font-size: 14.5px;
+      }
     }
-    .modal.show{ display:grid; }
 
-    .sheet{
-      width:min(760px, 95vw);
+    .close:hover {
+      background: rgba(255, 0, 127, 0.5);
+      border-color: rgba(255, 255, 255, 0.7);
+      transform: scale(1.06);
+    }
+
+    .sheetBody {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 640px) {
+      .sheetBody {
+        padding: 30px;
+        gap: 22px;
+        max-height: 78vh;
+      }
+    }
+
+    .sheetBody::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sheetBody::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+    }
+
+    /* Romantic Letter Inner Box */
+    .msg {
+      position: relative;
+      border-radius: 24px;
+      padding: 22px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background:
+        radial-gradient(600px circle at 15% 15%, rgba(255, 215, 0, 0.22), transparent 60%),
+        radial-gradient(600px circle at 85% 85%, rgba(255, 0, 127, 0.28), transparent 60%),
+        rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+      line-height: 2.1;
+      font-size: 15px;
+      font-weight: 600;
+      white-space: pre-wrap;
+      min-height: 150px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      box-shadow: inset 0 0 35px rgba(255, 0, 127, 0.12), 0 18px 45px rgba(0,0,0,0.45);
+    }
+
+    @media (min-width: 640px) {
+      .msg {
+        border-radius: 32px;
+        padding: 34px 36px;
+        line-height: 2.5;
+        font-size: 19px;
+        min-height: 180px;
+      }
+    }
+
+    .msg::before {
+      content: "💌";
+      position: absolute;
+      top: -16px;
+      right: 20px;
+      font-size: 24px;
+      background: rgba(14, 18, 38, 0.95);
+      padding: 2px 12px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255, 0, 127, 0.5);
+      box-shadow: 0 4px 20px rgba(255, 0, 127, 0.4);
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 110;
+      background: rgba(2, 3, 12, 0.92);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox.show {
+      display: grid;
+      opacity: 1;
+    }
+
+    .lbCard {
+      width: min(1080px, 96vw);
       border-radius: 28px;
-      border:1px solid rgba(255,255,255,.22);
-      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.08));
-      box-shadow: 0 28px 90px rgba(0,0,0,.6);
-      overflow:hidden;
-      transform: translateY(10px) scale(.98);
-      animation: in .22s ease-out forwards;
-    }
-    @keyframes in{ to{ transform: translateY(0) scale(1); } }
-
-    .sheetTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 16px;
-      border-bottom:1px solid rgba(255,255,255,.16);
-      background: radial-gradient(700px 260px at 50% 0%, rgba(255,79,163,.16), transparent 60%);
-    }
-    .sheetTop strong{ font-size:16px; letter-spacing:.2px; }
-
-    .close{
-      border:1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.08);
-      color:#fff;
-      border-radius: 14px;
-      padding:10px 12px;
-      font-weight:900;
-      cursor:pointer;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      background: rgba(15, 19, 40, 0.95);
+      box-shadow: 0 50px 140px rgba(0, 0, 0, 0.95);
+      overflow: hidden;
+      transform: scale(0.92);
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    .sheetBody{ padding:16px; display:grid; gap:14px; }
-
-    .msg{
-      border-radius: 22px;
-      padding:16px;
-      border:1px solid rgba(255,255,255,.18);
-      background:
-        radial-gradient(520px 200px at 20% 0%, rgba(255,210,74,.14), transparent 60%),
-        radial-gradient(520px 200px at 80% 30%, rgba(255,79,163,.14), transparent 60%),
-        rgba(255,255,255,.06);
-      line-height: 2.0;
-      font-size: 16px;
-      white-space:pre-wrap;
-      min-height: 132px;
+    .lightbox.show .lbCard {
+      transform: scale(1);
     }
 
-    /* ===== Lightbox ===== */
-    .lightbox{
-      position:fixed; inset:0;
-      display:none;
-      place-items:center;
-      z-index:6;
-      background: rgba(0,0,0,.62);
-      backdrop-filter: blur(10px);
-      padding:18px;
+    .lbTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13.5px;
+      background: rgba(0, 0, 0, 0.4);
+      flex-wrap: wrap;
     }
-    .lightbox.show{ display:grid; }
-    .lbCard{
-      width:min(980px, 96vw);
-      border-radius: 26px;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.10);
-      box-shadow: 0 30px 100px rgba(0,0,0,.65);
-      overflow:hidden;
+
+    @media (min-width: 640px) {
+      .lbTop {
+        padding: 20px 24px;
+        font-size: 15.5px;
+      }
     }
-    .lbTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.14);
-      color:var(--muted);
-      font-weight:900;
-      font-size:13px;
-      background: rgba(0,0,0,.10);
+
+    .lbBtns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .lbBtns{ display:flex; gap:8px; flex-wrap:wrap; }
-    .lbBtn{
-      border:1px solid rgba(255,255,255,.20);
-      background: rgba(255,255,255,.08);
-      color:#fff;
-      border-radius: 14px;
-      padding:10px 12px;
-      font-weight:1000;
-      cursor:pointer;
+
+    .lbBtn {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.25s ease;
     }
-    .lbBody{
-      display:grid;
-      place-items:center;
-      background: rgba(0,0,0,.18);
+
+    @media (min-width: 640px) {
+      .lbBtn {
+        border-radius: 14px;
+        padding: 10px 20px;
+        font-size: 14px;
+      }
     }
-    .lbBody img{
-      width:100%;
-      max-height: 78vh;
+
+    .lbBtn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .lbBody {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 14px;
+      min-height: 260px;
+    }
+
+    .lbBody img {
+      max-width: 100%;
+      max-height: 72vh;
       object-fit: contain;
-      display:block;
-    }
-
-    /* reduce motion */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important; }
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
     }
   </style>
 </head>
 
-<body>
-  <div class="aurora" aria-hidden="true"></div>
-  <div id="stars" aria-hidden="true"></div>
+<body class="relative min-h-screen bg-[#03020a] text-white">
 
-  <main class="wrap">
+  <!-- Canvas Interactive Engine -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Ambient Nebulas -->
+  <div class="fixed -inset-1/2 pointer-events-none z-0 blur-[120px] opacity-60 mix-blend-screen bg-[radial-gradient(circle_at_20%_15%,rgba(255,0,127,0.35),transparent_45%),radial-gradient(circle_at_80%_25%,rgba(168,85,247,0.35),transparent_50%),radial-gradient(circle_at_45%_75%,rgba(255,215,0,0.25),transparent_45%)] animate-pulse"></div>
+  <div id="stars" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- ULTRA MODERN MOBILE RESPONSIVE NAVBAR -->
+  <header class="sticky top-3 sm:top-5 z-50 w-[min(1140px,94vw)] mx-auto mb-5 sm:mb-8 px-4 sm:px-7 py-3 sm:py-4 rounded-2xl sm:rounded-full bg-slate-900/80 border border-white/15 shadow-2xl shadow-pink-500/10 backdrop-blur-2xl flex items-center justify-between gap-3 flex-wrap transition-all duration-300">
+    <a href="#" class="flex items-center gap-2.5 sm:gap-3.5 group text-decoration-none">
+      <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 via-pink-500 to-pink-600 flex items-center justify-center shadow-lg shadow-pink-500/40 border border-white/40 group-hover:rotate-12 transition-transform duration-300">
+        <span class="text-xl sm:text-2xl">💖</span>
+      </div>
+      <span class="font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-white via-amber-300 to-pink-500 bg-clip-text text-transparent">
+        محبوبتي
+      </span>
+    </a>
+
+    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <button class="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full border border-pink-500/40 bg-pink-500/15 text-white font-extrabold text-xs sm:text-sm hover:bg-pink-500/30 hover:shadow-lg hover:shadow-pink-500/30 transition-all flex items-center gap-2" id="musicToggle">
+        <div class="flex items-end gap-1 h-3 sm:h-3.5">
+          <span class="w-1 h-full bg-amber-400 rounded-full animate-bounce"></span>
+          <span class="w-1 h-full bg-pink-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+          <span class="w-1 h-full bg-cyan-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+        </div>
+        <span>موسيقى 🎵</span>
+      </button>
+
+      <button class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full border border-white/15 bg-white/10 font-bold text-xs sm:text-sm text-white backdrop-blur-md hover:bg-white/20 hover:border-white/30 transition-all flex items-center gap-1.5" id="toggleHearts">
+        القلوب: شغّالة
+      </button>
+
+      <button class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full border border-white/15 bg-white/10 font-bold text-xs sm:text-sm text-white backdrop-blur-md hover:bg-white/20 hover:border-white/30 transition-all flex items-center gap-1.5" id="toggleStars">
+        النجوم: شغّالة
+      </button>
+    </div>
+  </header>
+
+  <main class="relative z-10 w-[min(1140px,94vw)] mx-auto pb-12 sm:pb-16">
+
+    <!-- HERO GREETING BANNER -->
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-[36px] border border-white/15 bg-slate-900/50 p-5 sm:p-10 text-center backdrop-blur-2xl shadow-2xl shadow-pink-500/10 mb-6 sm:mb-8">
+      <div class="absolute -right-20 -top-20 w-60 h-60 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-amber-400/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <h1 class="text-2xl sm:text-5xl font-black tracking-tight mb-2 sm:mb-3 bg-gradient-to-r from-white via-amber-300 via-pink-400 to-pink-500 bg-clip-text text-transparent drop-shadow-md">
+        عالم محبوبتي ✨
+      </h1>
+
+      <div class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full border border-white/15 bg-white/10 text-xs sm:text-base font-bold text-white/90 backdrop-blur-md shadow-inner">
+        <span>مساحة خاصة مليانة حب وكياتة 💛</span>
+      </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE CARD CONTAINER -->
     <section class="scene">
-      <div class="card" id="card">
-        <div class="top">
-          <div class="brand">
-            <span class="logo" aria-hidden="true"></span>
-            <span>محبوبتي</span>
-          </div>
+      <div class="relative rounded-2xl sm:rounded-[38px] p-4 sm:p-10 bg-slate-900/65 border border-white/15 shadow-[0_40px_130px_-15px_rgba(0,0,0,0.9),0_0_80px_rgba(255,0,127,0.22)] backdrop-blur-3xl transition-transform duration-300 overflow-hidden" id="card">
 
-          <div class="hint">
-            <button class="pill" id="toggleHearts">القلوب: شغّالة</button>
-            <button class="pill" id="toggleStars">النجوم: شغّالة</button>
+        <!-- Card Internal Brand Header -->
+        <div class="flex items-center justify-between gap-3 mb-6 sm:mb-8 flex-wrap">
+          <div class="flex items-center gap-3 font-black text-xl sm:text-3xl bg-gradient-to-r from-white to-pink-500 bg-clip-text text-transparent">
+            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 to-pink-500 flex items-center justify-center shadow-lg shadow-pink-500/40 border border-white/40">
+              <span class="text-xl sm:text-3xl">💖</span>
+            </div>
+            <span>محبوبتي</span>
           </div>
         </div>
 
-        <div class="grid">
-          <div class="gift" id="gift" role="button" tabindex="0" aria-label="اضغطي لفتح الرسالة">
-            <div class="cube" aria-hidden="true">
+        <div class="grid gap-5 sm:gap-7">
+
+          <!-- TAILWIND 3D GIFT CONTAINER -->
+          <div class="relative group rounded-2xl sm:rounded-3xl border border-white/20 bg-gradient-to-b from-pink-500/25 via-purple-500/15 to-slate-950/70 p-5 sm:p-8 h-[200px] sm:h-[240px] flex flex-col items-center justify-center cursor-pointer shadow-2xl shadow-pink-500/20 hover:border-pink-500/60 hover:shadow-pink-500/40 transition-all duration-500 overflow-hidden" id="gift" role="button" tabindex="0" aria-label="اضغطي لفتح الرسالة">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,0,127,0.35),transparent_70%)] opacity-80 group-hover:opacity-100 transition-opacity"></div>
+
+            <div class="cube relative mb-3 sm:mb-4" aria-hidden="true">
               <div class="face top"></div>
               <div class="ribbon"></div>
               <div class="bow"><div class="knot"></div></div>
             </div>
-            <div class="giftText">اضغطي هنا يا أحلى كتكوته 💛</div>
+
+            <div class="relative font-extrabold text-xs sm:text-lg text-white bg-black/40 border border-white/25 backdrop-blur-md px-4 py-2 sm:px-7 sm:py-3 rounded-full shadow-xl group-hover:bg-pink-500/45 group-hover:border-white/50 group-hover:scale-105 transition-all duration-300 flex items-center gap-2">
+              <span>اضغطي هنا يا أحلى كتكوته 💛</span>
+            </div>
           </div>
 
-          <div class="controls">
-            <div class="nameBox">
-              <input id="nickname" placeholder="مثلاً: كتكوته" value="حياتي" />
+          <!-- CONTROLS & NAME INPUT (MOBILE FLEX STACK) -->
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+            <div class="flex-1 flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-500/40 transition-all w-full sm:min-w-[280px]">
+              <span class="text-white/80 font-bold text-xs sm:text-base whitespace-nowrap">اسمك الحلو:</span>
+              <input id="nickname" class="flex-1 bg-transparent border-0 outline-none text-white font-extrabold text-sm sm:text-lg placeholder-white/40" placeholder="مثلاً: كتكوته" value="حياتي" />
             </div>
-            <button class="btn" id="another">رسالة تانية ✨</button>
-            <button class="btn mini" id="burst">قلوب كتير 💗</button>
+
+            <button class="px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-amber-400 via-pink-500 to-pink-600 shadow-xl shadow-pink-500/30 hover:shadow-pink-500/50 hover:-translate-y-1 active:translate-y-0 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto" id="another">
+              <span>رسالة تانية ✨</span>
+            </button>
+
+            <button class="px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base text-white border border-white/15 bg-white/10 backdrop-blur-xl hover:bg-white/20 hover:border-white/30 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto" id="burst">
+              <span>قلوب كتير 💗</span>
+            </button>
           </div>
 
-          <!-- ========= سيكشن الصور الجديد ========= -->
-          <section class="photoSection" aria-label="صورك اللي بحبها">
-            <div class="secHead">
-              <div class="secTitle">
-                <h2>صورك اللي بحبها 💛</h2>
+          <!-- PHOTO GALLERY SECTION -->
+          <section class="relative rounded-2xl sm:rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl overflow-hidden transition-all duration-300" aria-label="صورك اللي بحبها">
+            <div class="px-4 sm:px-7 py-4 sm:py-5 flex items-center justify-between gap-3 flex-wrap border-b border-white/15 bg-black/30">
+              <div class="flex flex-col gap-1">
+                <h2 class="m-0 text-lg sm:text-2xl font-black bg-gradient-to-r from-white via-amber-300 to-pink-500 bg-clip-text text-transparent">
+                  صورك اللي بحبها 💛
+                </h2>
               </div>
-              <div class="secStats">
-                <span class="stat" id="photoCount">  بعض من الصوه ممتلئه بالكياته </span>
-                <span class="stat">✨ مش بحب في الدنيا قدك </span>
+              <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/15 bg-white/10 text-[11px] sm:text-sm font-bold text-white" id="photoCount">بعض من الصوه ممتلئه بالكياته</span>
+                <span class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/15 bg-white/10 text-[11px] sm:text-sm font-bold text-white">✨ مش بحب في الدنيا قدك</span>
               </div>
             </div>
 
-            <div class="galleryScroll">
+            <div class="relative p-4 sm:p-6 max-h-[55vh] sm:max-h-[68vh] overflow-y-auto custom-scrollbar">
               <div class="galleryGrid" id="gallery"></div>
             </div>
           </section>
 
-          <div class="footerRow">
-            <span id="counter">💗 0</span>
+          <!-- COUNTER FOOTER ROW -->
+          <div class="flex justify-between items-center gap-3 flex-wrap pt-1">
+            <span id="counter" class="font-extrabold text-xs sm:text-base bg-pink-500/20 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-pink-500/40 text-pink-400 flex items-center gap-2 shadow-lg shadow-pink-500/20">
+              💗 0
+            </span>
           </div>
+
         </div>
       </div>
     </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-8 sm:mt-12 text-center p-6 sm:p-8 rounded-2xl sm:rounded-[36px] bg-slate-900/40 border border-white/15 backdrop-blur-xl text-white/80 font-bold text-xs sm:text-sm flex flex-col items-center gap-1.5">
+      <div>صُنِع بحب كبييييير جداً عشانك 💗</div>
+      <div class="text-[11px] opacity-60">محبوبتي • جميع الحقوق محفوظة لقلبك ✨</div>
+    </footer>
   </main>
 
-  <!-- Modal الرسالة -->
+  <!-- MASTER LUXURY ROMANTIC MESSAGE MODAL -->
   <div class="modal" id="modal" aria-hidden="true">
     <div class="sheet" role="dialog" aria-modal="true" aria-label="رسالة محبوبتي">
       <div class="sheetTop">
-        <strong>رسالة لـ <span id="who">كتكوته</span> 💛</strong>
+        <strong>
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 via-pink-500 to-pink-600 flex items-center justify-center shadow-lg shadow-pink-500/40 border border-white/40">
+            <span class="text-base sm:text-xl">💌</span>
+          </div>
+          <span>رسالة لـ <span id="who" class="bg-gradient-to-r from-amber-300 via-pink-400 to-pink-500 bg-clip-text text-transparent font-black">كتكوته</span> 💛</span>
+        </strong>
         <button class="close" id="close">إغلاق</button>
       </div>
+
       <div class="sheetBody">
         <div class="msg" id="msg"></div>
+
+        <!-- Master Action Controls Inside Modal -->
+        <div class="flex items-center justify-between gap-2.5 pt-2 flex-wrap">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="copyMsgBtn" class="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm text-white border border-white/20 bg-white/10 backdrop-blur-xl hover:bg-white/20 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+              <span>نسخ الرسالة 📋</span>
+            </button>
+            <button id="modalBurstHearts" class="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm text-pink-300 border border-pink-500/30 bg-pink-500/15 backdrop-blur-xl hover:bg-pink-500/30 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+              <span>تفاعل 💗</span>
+            </button>
+          </div>
+
+          <button id="modalAnother" class="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-pink-500 to-pink-600 shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <span>رسالة تانية ✨</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Lightbox للصور -->
+  <!-- LIGHTBOX MODAL -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <div class="lbCard" role="dialog" aria-modal="true" aria-label="عارض الصور">
       <div class="lbTop">
@@ -759,21 +688,136 @@
     </div>
   </div>
 
-  <!-- Modal رسالة البداية (الجديد) -->
-  <div class="modal" id="startModal" aria-hidden="true">
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="رسالة البداية">
-      <div class="sheetTop">
-        <strong>رسالة لـ <span id="startWho">كتكوته</span> 💛</strong>
-        <button class="close" id="startClose">إغلاق</button>
-      </div>
-      <div class="sheetBody">
-        <div class="msg" id="startMsg"></div>
-      </div>
-    </div>
-  </div>
-
 <script>
-  // ===== رسائل رومانسية =====
+  // ===== Interactive Web Audio Synthesizer =====
+  let audioCtx = null;
+  let isPlayingMusic = false;
+  let musicInterval = null;
+
+  function playRomanticTone(freq = 440, type = 'sine') {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.8);
+    } catch(e){}
+  }
+
+  const chords = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23, 293.66, 329.63];
+  const musicBtn = document.getElementById("musicToggle");
+
+  function toggleMusic() {
+    isPlayingMusic = !isPlayingMusic;
+    if (isPlayingMusic) {
+      musicBtn.classList.add("border-pink-500", "bg-pink-500/40");
+      let step = 0;
+      playRomanticTone(chords[0], 'sine');
+      musicInterval = setInterval(() => {
+        step = (step + 1) % chords.length;
+        playRomanticTone(chords[step], step % 2 === 0 ? 'sine' : 'triangle');
+      }, 1200);
+    } else {
+      musicBtn.classList.remove("border-pink-500", "bg-pink-500/40");
+      if (musicInterval) clearInterval(musicInterval);
+    }
+  }
+  musicBtn.addEventListener("click", toggleMusic);
+
+  // ===== Canvas Background Particles Engine =====
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+  let particles = [];
+  let mouse = { x: null, y: null };
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2.8 + 0.5;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.alpha = Math.random() * 0.6 + 0.25;
+      const colors = ["#ff007f", "#ffd700", "#00f5ff", "#a855f7", "#ffffff"];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (mouse.x && mouse.y) {
+        let dx = mouse.x - this.x;
+        let dy = mouse.y - this.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 130) {
+          this.x -= (dx / dist) * 0.9;
+          this.y -= (dy / dist) * 0.9;
+        }
+      }
+
+      if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+        this.reset();
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.alpha;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = this.color;
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = Math.floor((canvas.width * canvas.height) / 14000);
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+  }
+  initParticles();
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // ===== Romantic Messages =====
   const messages = [
     `يا {name} 💛
 إنتِ قد الفترة دي… وإن شاء الله هتعدّي على خير.
@@ -797,7 +841,7 @@
    بحبك ي احلا واحده حنينه عليا في الدنيا واكتر حاجه انا دايب فيها      ✨`
   ];
 
-  // ===== عناصر عامة =====
+  // ===== General Elements =====
   const card = document.getElementById("card");
   const gift = document.getElementById("gift");
   const modal = document.getElementById("modal");
@@ -806,6 +850,9 @@
   const whoEl = document.getElementById("who");
   const nicknameEl = document.getElementById("nickname");
   const anotherBtn = document.getElementById("another");
+  const modalAnotherBtn = document.getElementById("modalAnother");
+  const copyMsgBtn = document.getElementById("copyMsgBtn");
+  const modalBurstHeartsBtn = document.getElementById("modalBurstHearts");
   const burstBtn = document.getElementById("burst");
   const counterEl = document.getElementById("counter");
   const toggleHeartsBtn = document.getElementById("toggleHearts");
@@ -824,32 +871,30 @@
   const lbPrev = document.getElementById("lbPrev");
   const lbNext = document.getElementById("lbNext");
 
-  // ===== (الجديد) عناصر رسالة البداية =====
-  const startModal = document.getElementById("startModal");
-  const startClose = document.getElementById("startClose");
-  const startMsgEl = document.getElementById("startMsg");
-  const startWhoEl = document.getElementById("startWho");
-
   let heartsOn = true;
   let starsOn = true;
   let heartCount = 0;
   let lastMsg = -1;
   let typerTimer = null;
+  let currentRawText = "";
 
-  // ===== 3D tilt للكارت =====
-  card.addEventListener("mousemove", (e) => {
-    const r = card.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    const rx = ((y / r.height) - 0.5) * -6;
-    const ry = ((x / r.width) - 0.5) * 8;
-    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
-    card.style.setProperty("--mx", (x / r.width) * 100 + "%");
-    card.style.setProperty("--my", (y / r.height) * 100 + "%");
-  });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "rotateX(0deg) rotateY(0deg)";
-  });
+  // ===== 3D Tilt Physics (Desktop only) =====
+  if (window.innerWidth > 768) {
+    card.addEventListener("mousemove", (e) => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      const rx = ((y / r.height) - 0.5) * -8;
+      const ry = ((x / r.width) - 0.5) * 10;
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      card.style.setProperty("--mx", (x / r.width) * 100 + "%");
+      card.style.setProperty("--my", (y / r.height) * 100 + "%");
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "rotateX(0deg) rotateY(0deg)";
+    });
+  }
 
   function getName(){
     const v = (nicknameEl.value || "").trim();
@@ -870,17 +915,21 @@
     modal.classList.add("show");
     modal.setAttribute("aria-hidden", "false");
   }
+
   function closeModal(){
     modal.classList.remove("show");
     modal.setAttribute("aria-hidden", "true");
     stopTyping();
   }
+
   function stopTyping(){
     if (typerTimer) clearInterval(typerTimer);
     typerTimer = null;
   }
+
   function typeMessage(text){
     stopTyping();
+    currentRawText = text;
     msgEl.textContent = "";
     let i = 0;
     typerTimer = setInterval(() => {
@@ -889,64 +938,65 @@
       if (i >= text.length) stopTyping();
     }, 18);
   }
+
   function showMessage(){
     const text = pickMessage();
     openModal();
     typeMessage(text);
-    popHearts(14);
+    popHearts(16);
+    playRomanticTone(523.25, 'sine');
   }
 
-  // ===== (الجديد) رسالة البداية =====
-  function openStartModal(){
-    const name = getName();
-    startWhoEl.textContent = name;
-
-  const text =
-`السلام عليكم ورحمه الله وبركاته
-قبل اي حاجه ربنا يوفقك يارب ويكرمك في حياتك 
-انا الصراحه مش عارف اواجهك واقولك الكلام ده وتردي عليه بيه لا انتي هتشوفيه هنا وحتي مش عايز منك رد  
-انا اتغيرت يفرحه والله كل حاجه مبقتش زي الاول حتي الحب مبقتش بحسه اتجاه اي حاجه بعد ماسبتيني كل حاجه اتحولت كنت لوحدي بعيط بليل لوحدي كل حاجه بقيت معنديش شغف ليها  حرفيا العياط كنت بفضل اعيط لحد مايخلي عيني تبقي حمره بس ماعلينا انا الحمدلله عديت بالفتره دي وربنا هداني وبقيت كويس في كام حاجه واسال الله الهدايه والف حمد وشكر علي كده 
-وجودك حتي دلوقتي بسبب الحركات اللي بتعمليها مبقاش ليه طعم زي الاول لمما كنتي بتبعدي وترجعي كنت بقولك وحشتيني لي غيبتي بس دلوقت لا انا حرفيا كانت كل حاجه من قلبي كل مره كنت اديكي فرصه وانتي تبعدي ومبقاش فارقلك كذا مره اقولك متتسرعيش في حاجه تعالي كلميني ونفكر سوا وانتي مش بتعملي غير اللي في دماغاك لحد ماوصلتيني للي انا فيه ده وصلت لمرحله مش عايز احب ولا عايز اتحب اننا كده كده عرفت اني عمري ماتحبيت بنفس الحب اللي بديه للناس اي كان بقي مش شرط تكون بنت دايما انا بوفي ومحدش بيقدر ياما اضحك عليا خلاص تعبت حتي مبقتش قادر لما انتي بعدتي قعدت اعيط لربنا واقوله خلاص مش هعمل كده تاني يارب سامحني يارب سامحني وكلام كتير الحمدلله ربنا بيسامح وبيسترنا ماحنا مش ملايكه ولامعصومين من الغلط بس المهم لما نغلط نتوب ونرجع لربنا ايا كان بقي المره الكام تغلط ربنا غفور ورحيم هنعيش لحد مانموت نغلط ونتوب لربنا مهو ده طبع البشر بس يعني تقريبا ده اللي عايز اقوله وبنا يوفقني ويوفقك وياريت تشوفي الرساله ومتفتحيش معايا الموضوع فيها شوفيها ولا كانك شوفتي الرساله والسلام عليكم`;
-
-    startModal.classList.add("show");
-    startModal.setAttribute("aria-hidden", "false");
-    startMsgEl.textContent = text; // بدون كتابة تدريجية
-    popHearts(12);
+  // Copy Message Handler
+  if (copyMsgBtn) {
+    copyMsgBtn.addEventListener("click", () => {
+      if (currentRawText) {
+        navigator.clipboard.writeText(currentRawText).then(() => {
+          copyMsgBtn.innerHTML = `<span>تم النسخ! 💖</span>`;
+          setTimeout(() => {
+            copyMsgBtn.innerHTML = `<span>نسخ الرسالة 📋</span>`;
+          }, 2000);
+        });
+      }
+    });
   }
-  function closeStartModal(){
-    startModal.classList.remove("show");
-    startModal.setAttribute("aria-hidden", "true");
-  }
-  startClose.addEventListener("click", closeStartModal);
-  startModal.addEventListener("click", (e) => { if (e.target === startModal) closeStartModal(); });
 
-  // ===== شرارات =====
-  function sparks(x,y){
-    const n = 14;
-    for (let i=0;i<n;i++){
+  if (modalBurstHeartsBtn) {
+    modalBurstHeartsBtn.addEventListener("click", () => {
+      popHearts(20);
+      sparks(innerWidth * 0.5, innerHeight * 0.5);
+    });
+  }
+
+  // ===== Spark Burst =====
+  function sparks(x, y){
+    if (x === undefined || x === null || isNaN(x)) x = window.innerWidth / 2;
+    if (y === undefined || y === null || isNaN(y)) y = window.innerHeight / 2;
+    const n = window.innerWidth < 640 ? 14 : 22;
+    for (let i=0; i<n; i++){
       const s = document.createElement("div");
       s.className = "spark";
       s.style.left = x + "px";
       s.style.top = y + "px";
-      s.style.setProperty("--sx", rand(-120,120) + "px");
-      s.style.setProperty("--sy", rand(-120,120) + "px");
-      s.style.opacity = (Math.random()*0.5 + 0.4).toFixed(2);
+      s.style.setProperty("--sx", rand(-160, 160) + "px");
+      s.style.setProperty("--sy", rand(-160, 160) + "px");
+      s.style.opacity = (Math.random()*0.5 + 0.5).toFixed(2);
       document.body.appendChild(s);
       s.addEventListener("animationend", () => s.remove());
     }
   }
 
-  // ===== قلوب =====
+  // ===== Falling Hearts =====
   function createHeart(){
     const heart = document.createElement("div");
     heart.className = "heart";
 
-    const size = rand(14, 42);
+    const size = rand(16, 44);
     const left = Math.random() * 100;
-    const duration = rand(4200, 9800);
-    const dx = rand(-22, 22) + "vw";
-    const rot = rand(-40, 40) + "deg";
-    const opacity = (Math.random()*0.35 + 0.55).toFixed(2);
+    const duration = rand(3600, 8000);
+    const dx = rand(-28, 28) + "vw";
+    const rot = rand(-50, 50) + "deg";
+    const opacity = (Math.random()*0.35 + 0.65).toFixed(2);
 
     heart.style.left = left + "vw";
     heart.style.width = size + "px";
@@ -956,7 +1006,8 @@
     heart.style.animationDuration = duration + "ms";
     heart.style.opacity = opacity;
 
-    const color = Math.random() < 0.62 ? "#ff4fa3" : (Math.random() < 0.6 ? "#ffd24a" : "#62f3ff");
+    const colors = ["#ff007f", "#ffd700", "#00f5ff", "#a855f7", "#ff66b2"];
+    const color = colors[Math.floor(Math.random() * colors.length)];
 
     heart.innerHTML = `
       <svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}" xmlns="http://www.w3.org/2000/svg">
@@ -972,12 +1023,12 @@
 
   function popHearts(n=10){
     if (!heartsOn) return;
-    for (let i=0;i<n;i++){
-      setTimeout(createHeart, i*80);
+    for (let i=0; i<n; i++){
+      setTimeout(createHeart, i*70);
     }
   }
 
-  setInterval(() => { if (heartsOn) createHeart(); }, 620);
+  setInterval(() => { if (heartsOn) createHeart(); }, 550);
 
   toggleHeartsBtn.addEventListener("click", () => {
     heartsOn = !heartsOn;
@@ -988,13 +1039,13 @@
   function buildStars(){
     starsWrap.innerHTML = "";
     if (!starsOn) return;
-    for (let i=0;i<70;i++){
+    for (let i=0; i<90; i++){
       const s = document.createElement("div");
-      s.className = "star";
-      s.style.left = rand(0,100) + "vw";
-      s.style.top  = rand(0,100) + "vh";
-      s.style.animationDelay = rand(0,2200) + "ms";
-      s.style.opacity = (Math.random()*0.5 + 0.25).toFixed(2);
+      s.className = "star relative";
+      s.style.left = rand(0, 100) + "vw";
+      s.style.top  = rand(0, 100) + "vh";
+      s.style.animationDelay = rand(0, 2500) + "ms";
+      s.style.opacity = (Math.random()*0.5 + 0.35).toFixed(2);
       starsWrap.appendChild(s);
     }
   }
@@ -1005,25 +1056,24 @@
     buildStars();
   });
 
-  // ====== صورك اللي بحبها (21 صورة) ======
-  // ضع الملفات في: images/1.jpeg ... images/21.jpeg
+  // ====== 21 Photos Bento Grid Gallery ======
   const photos = Array.from({length: 21}, (_, i) => ({
     src: `images/${i+1}.jpeg`,
     n: i+1
   }));
 
-  photoCountEl.textContent = `📸`;
+  photoCountEl.textContent = `بعض من الصوه ممتلئه بالكياته`;
 
   function renderGallery(){
     galleryEl.innerHTML = "";
     photos.forEach((p, idx) => {
       const tile = document.createElement("div");
-      tile.className = "tile";
+      tile.className = "tile relative rounded-xl sm:rounded-2xl overflow-hidden border border-white/15 bg-black/40 shadow-xl cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:border-white/60 hover:shadow-2xl hover:shadow-pink-500/30 group";
       tile.innerHTML = `
-        <img src="${p.src}" alt="صورة رقم ${p.n}" loading="lazy">
-        <div class="num">#${p.n}</div>
-        <div class="cornerHeart" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="rgba(255,255,255,.92)" xmlns="http://www.w3.org/2000/svg">
+        <img src="${p.src}" alt="صورة رقم ${p.n}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+        <div class="absolute top-2.5 right-2.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-black text-white bg-black/60 border border-white/20 backdrop-blur-md z-10 shadow-md">#${p.n}</div>
+        <div class="absolute bottom-2.5 left-2.5 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center bg-black/60 border border-white/20 backdrop-blur-md z-10 group-hover:scale-110 group-hover:bg-pink-500/60 transition-all">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="rgba(255,255,255,.95)" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 21s-6.716-4.29-9.5-8.07C.42 10.62 1.1 7.67 3.05 5.9c1.95-1.77 4.99-1.55 6.64.35L12 8.6l2.31-2.35c1.65-1.9 4.69-2.12 6.64-.35 1.95 1.77 2.63 4.72.55 7.03C18.716 16.71 12 21 12 21z"/>
           </svg>
         </div>
@@ -1039,10 +1089,11 @@
     currentIndex = idx;
     const p = photos[currentIndex];
     lbImg.src = p.src;
-    lbTitle.textContent = ` دي صورك اللي بحبها  يروحي• ${p.n}/${photos.length}`;
+    lbTitle.textContent = `دي صورك اللي بحبها  يروحي• ${p.n}/${photos.length}`;
     lightbox.classList.add("show");
     lightbox.setAttribute("aria-hidden", "false");
     popHearts(10);
+    playRomanticTone(440, 'sine');
   }
 
   function closeLightbox(){
@@ -1061,20 +1112,29 @@
   lbNext.addEventListener("click", () => stepLightbox(1));
   lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
 
-  // ===== أحداث =====
-  gift.addEventListener("click", (e) => { sparks(e.clientX, e.clientY); showMessage(); });
+  // ===== Events =====
+  gift.addEventListener("click", (e) => {
+    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight / 2);
+    sparks(x, y);
+    showMessage();
+  });
   gift.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " "){ e.preventDefault(); showMessage(); }
   });
 
   anotherBtn.addEventListener("click", () => { sparks(innerWidth*0.7, innerHeight*0.5); showMessage(); });
+  if (modalAnotherBtn) {
+    modalAnotherBtn.addEventListener("click", () => { sparks(innerWidth*0.5, innerHeight*0.5); showMessage(); });
+  }
+
   burstBtn.addEventListener("click", () => { sparks(innerWidth*0.5, innerHeight*0.55); popHearts(26); });
 
   closeBtn.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { closeModal(); closeLightbox(); closeStartModal(); }
+    if (e.key === "Escape") { closeModal(); closeLightbox(); }
     if (lightbox.classList.contains("show")){
       if (e.key === "ArrowLeft") stepLightbox(1);
       if (e.key === "ArrowRight") stepLightbox(-1);
@@ -1084,11 +1144,6 @@
   // init
   buildStars();
   renderGallery();
-
-  // (الجديد) تشغيل رسالة البداية أول ما الصفحة تفتح
-  window.addEventListener("load", () => {
-    openStartModal();
-  });
 
   function rand(min, max){
     return Math.floor(Math.random()*(max-min+1))+min;
